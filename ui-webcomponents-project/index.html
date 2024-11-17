@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Web Components</title>
+    <script src="https://htmlelements.com/demos/scripts/smart.element.js"></script>
+    <script src="https://htmlelements.com/demos/scripts/smart.tree.js"></script>
+    <script src="https://htmlelements.com/demos/scripts/smart.grid.js"></script>
+    <script src="https://htmlelements.com/demos/scripts/smart.window.js"></script>
+    <link rel="stylesheet" href="https://htmlelements.com/demos/styles/smart.default.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #app {
+            display: flex;
+            flex-wrap: wrap;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #left-panel {
+            width: 20%;
+            height: 80%;
+            border-right: 1px solid #ccc;
+            background-color: #f5f5f5;
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        #center-panel {
+            width: 60%;
+            height: 80%;
+            background-color: #ffffff;
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        #right-panel {
+            width: 20%;
+            height: 80%;
+            border-left: 1px solid #ccc;
+            background-color: #f5f5f5;
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        #bottom-panel {
+            width: 100%;
+            height: 20%;
+            border-top: 1px solid #ccc;
+            background-color: #f5f5f5;
+            padding: 1rem;
+            overflow: auto;
+        }
+
+        @media (max-width: 768px) {
+            #left-panel, #center-panel, #right-panel {
+                width: 100%;
+                height: auto;
+                min-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="left-panel">
+            <smart-tree id="navigation-tree">
+                <smart-tree-items-group>RDBMS
+                    <smart-tree-items-group>Oracle
+                        <smart-tree-items-group>TESTDB
+                            <smart-tree-items-group>Tables
+                                <smart-tree-item>Employee</smart-tree-item>
+                                <smart-tree-item>Department</smart-tree-item>
+                            </smart-tree-items-group>
+                            <smart-tree-items-group>Views
+                                <smart-tree-item>Emp_View</smart-tree-item>
+                                <smart-tree-item>Dept_View</smart-tree-item>
+                            </smart-tree-items-group>
+                        </smart-tree-items-group>
+                    </smart-tree-items-group>
+                </smart-tree-items-group>
+            </smart-tree>
+        </div>
+        <div id="center-panel">
+            <div id="content">
+                <h2>Select an item from the tree</h2>
+            </div>
+        </div>
+        <div id="right-panel">
+            <smart-window id="details-dialog">
+                <div id="dialog-content"></div>
+            </smart-window>
+        </div>
+        <div id="bottom-panel">
+            <smart-grid id="data-grid"></smart-grid>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tree
+            const tree = document.querySelector('smart-tree');
+            if (tree) {
+                tree.addEventListener('change', function(event) {
+                    const selectedItem = event.detail.item;
+                    if (selectedItem) {
+                        document.getElementById('content').innerHTML = `
+                            <h2>${selectedItem.innerHTML}</h2>
+                            <button onclick="showDetails('${selectedItem.innerHTML}')">Show Details</button>
+                        `;
+                    }
+                });
+            }
+
+            // Initialize grid with correct property types
+            const grid = document.querySelector('smart-grid');
+            if (grid) {
+                grid.dataSource = [
+                    { id: 1, name: 'John Doe', department: 'IT' },
+                    { id: 2, name: 'Jane Smith', department: 'HR' },
+                    { id: 3, name: 'Bob Johnson', department: 'Finance' }
+                ];
+                
+                grid.columns = [
+                    { label: 'ID', dataField: 'id' },
+                    { label: 'Name', dataField: 'name' },
+                    { label: 'Department', dataField: 'department' }
+                ];
+
+                // Set grid properties correctly
+                grid.sortMode = 'one'; // Use string instead of boolean
+                grid.filtering = true;
+                grid.paging = true;
+            }
+        });
+
+        function showDetails(label) {
+            const dialog = document.getElementById('details-dialog');
+            document.getElementById('dialog-content').innerHTML = `
+                <h3>${label} Details</h3>
+                <form>
+                    <label>Name: <input type="text" value="${label}"></label><br><br>
+                    <label>Type: <input type="text" value="Sample Type"></label><br><br>
+                    <button type="button" onclick="closeDialog()">Close</button>
+                </form>
+            `;
+            dialog.opened = true;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('details-dialog');
+            dialog.opened = false;
+        }
+    </script>
+</body>
+</html>

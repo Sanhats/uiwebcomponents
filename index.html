@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Management UI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fb;
+            color: #333;
+        }
+        .left-panel {
+            width: 280px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            overflow-y: auto;
+            border-right: 1px solid #34495e;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+        .tree {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        .tree li {
+            margin: 8px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .tree li:hover {
+            background-color: #34495e;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            border-radius: 10px;
+            min-height: 400px;
+            position: relative;
+        }
+        .main-content h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .draggable {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: grab;
+        }
+        .drop-zone {
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search..." oninput="filterTree()">
+        </div>
+        <ul class="tree" id="tree-list">
+            <li draggable="true" ondragstart="drag(event)">RDBMS
+                <ul>
+                    <li draggable="true" ondragstart="drag(event)">Oracle
+                        <ul>
+                            <li draggable="true" ondragstart="drag(event)">TESTDB
+                                <ul>
+                                    <li draggable="true" ondragstart="drag(event)">Tables
+                                        <ul>
+                                            <li draggable="true" ondragstart="drag(event)">Employee</li>
+                                            <li draggable="true" ondragstart="drag(event)">Department</li>
+                                        </ul>
+                                    </li>
+                                    <li draggable="true" ondragstart="drag(event)">Views
+                                        <ul>
+                                            <li draggable="true" ondragstart="drag(event)">Emp_View</li>
+                                            <li draggable="true" ondragstart="drag(event)">Dept_View</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li draggable="true" ondragstart="drag(event)">QADB</li>
+                        </ul>
+                    </li>
+                    <li draggable="true" ondragstart="drag(event)">SQLServer</li>
+                    <li draggable="true" ondragstart="drag(event)">NoSQL
+                        <ul>
+                            <li draggable="true" ondragstart="drag(event)">MongoDB
+                                <ul>
+                                    <li draggable="true" ondragstart="drag(event)">DB1</li>
+                                    <li draggable="true" ondragstart="drag(event)">DB2</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <h2>Main Content Area</h2>
+        <p>Drag and drop elements here or click on items to open properties.</p>
+        <div class="drop-zone" id="drop-zone" ondragover="allowDrop(event)" ondrop="drop(event)">
+            Drop here
+        </div>
+    </div>
+    <!-- Dialog Box -->
+    <div class="overlay" id="overlay" onclick="closeDialog()"></div>
+    <div class="dialog" id="dialog-box">
+        <h3>Properties</h3>
+        <p id="properties-content">Details about the selected item will appear here.</p>
+        <button onclick="closeDialog()">Close</button>
+    </div>
+
+    <script>
+        function openDialog(content) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('dialog-box').style.display = 'block';
+            document.getElementById('properties-content').textContent = content;
+        }
+        
+        function closeDialog() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('dialog-box').style.display = 'none';
+        }
+
+        function filterTree() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const items = document.querySelectorAll('.tree li');
+            items.forEach(item => {
+                if (item.textContent.toLowerCase().includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.textContent);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData("text");
+            const dropZone = document.getElementById('drop-zone');
+            const newItem = document.createElement('div');
+            newItem.textContent = data;
+            newItem.classList.add('draggable');
+            newItem.onclick = () => openDialog(`Properties of ${data}`);
+            dropZone.appendChild(newItem);
+        }
+    </script>
+
+    <div class="footer">
+        <p>&copy; 2024 Database Management UI. All rights reserved.</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+#app {
+  display: flex;
+  height: 100vh;
+  flex-wrap: wrap;
+}
+
+#left-panel {
+  width: 20%;
+  height: 80%;
+  border-right: 1px solid #ccc;
+}
+
+#center-panel {
+  width: 60%;
+  height: 80%;
+}
+
+#right-panel {
+  width: 20%;
+  height: 80%;
+  border-left: 1px solid #ccc;
+}
+
+#bottom-panel {
+  width: 100%;
+  height: 20%;
+  border-top: 1px solid #ccc;
+}
